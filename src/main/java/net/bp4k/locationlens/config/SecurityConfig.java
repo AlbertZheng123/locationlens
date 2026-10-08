@@ -1,5 +1,7 @@
 package net.bp4k.locationlens.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -9,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration
     .EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import net.bp4k.locationlens.security.IdpTokenRelaySuccessHandler;
@@ -65,6 +70,7 @@ public class SecurityConfig {
             throws Exception {
         return http
             .securityMatcher("/api/v1/**")
+            .cors(withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS))
             .csrf(csrf -> csrf.disable())
@@ -116,5 +122,25 @@ public class SecurityConfig {
             .oauth2Login(oauth2 -> oauth2
                     .successHandler(idpTokenRelaySuccessHandler))
             .build();
+    }
+
+
+    /**
+     * Allow all sites to request the API.
+     * @note Allow configuration through Spring Boot Parameter so that this is
+     * safer in production
+     */
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source 
+            = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
