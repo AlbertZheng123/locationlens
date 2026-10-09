@@ -44,3 +44,8 @@ now run the app
 ```
 ./mvnw spring:run
 ```
+
+## Reviews frontend
+
+The React `ReviewView`, API contract, and frontend test/build instructions are
+in [frontend/README.md](frontend/README.md).
